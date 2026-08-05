@@ -1,0 +1,65 @@
+@model JoyeriaMorgan.Models.ProductoViewModel
+@{
+    ViewData["Title"] = "Registrar Nueva Joya";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">@ViewData["Title"]</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Registrar" method="post">
+                    <div class="mb-3">
+                        <label asp-for="CategoriaId" class="form-label"></label>
+                        <select asp-for="CategoriaId" asp-items="ViewBag.Categorias" class="form-select">
+                            <option value="">-- Seleccione una Categoría --</option>
+                        </select>
+                        <span asp-validation-for="CategoriaId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Ej. Anillo Solitario Oro 18k" />
+                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Descripcion" class="form-label"></label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Precio" class="form-label">Precio (S/)</label>
+                            <input asp-for="Precio" type="number" step="0.01" class="form-control" />
+                            <span asp-validation-for="Precio" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Stock" class="form-label"></label>
+                            <input asp-for="Stock" type="number" class="form-control" />
+                            <span asp-validation-for="Stock" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ImagenUrl" class="form-label">Nombre de Imagen / URL</label>
+                        <input asp-for="ImagenUrl" class="form-control" placeholder="ejemplo.jpg" />
+                        <span asp-validation-for="ImagenUrl" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Volver al Catálogo</a>
+                        <button type="submit" class="btn btn-dark">Guardar Joya</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

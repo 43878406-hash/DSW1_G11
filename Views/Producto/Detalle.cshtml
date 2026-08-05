@@ -1,0 +1,38 @@
+@model JoyeriaMorgan.Models.ProductoViewModel
+@{
+    ViewData["Title"] = Model.Nombre;
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow">
+
+            @if (!string.IsNullOrWhiteSpace(Model.ImagenUrl))
+            {
+                <img src="@Model.ImagenUrl" class="card-img-top" alt="@Model.Nombre"
+                     style="max-height: 350px; object-fit: cover;" />
+            }
+
+
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">@Model.Nombre</h5>
+                <span class="badge bg-secondary">@Model.NombreCategoria</span>
+            </div>
+            <div class="card-body">
+                <h4 class="text-primary mb-3">S/ @Model.Precio.ToString("N2")</h4>
+                <p class="card-text">
+                    <strong>Descripción:</strong><br />
+                    @(string.IsNullOrEmpty(Model.Descripcion) ? "No se ha proporcionado una descripción para este producto." : Model.Descripcion)
+                </p>
+                <hr />
+                <p class="card-text mb-0">
+                    <strong>Disponibilidad en almacén:</strong> @Model.Stock unidades
+                </p>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-outline-secondary">Volver al Catálogo</a>
+                <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-warning">Editar</a>
+            </div>
+        </div>
+    </div>
+</div>
