@@ -12,8 +12,8 @@ builder.Services.AddScoped<JoyeriaMorgan.Data.IUsuarioRepositorio, JoyeriaMorgan
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Cuenta/Login";
-        options.AccessDeniedPath = "/Cuenta/AccesoDenegado";
+        options.LoginPath = "/Login";
+        options.AccessDeniedPath = "/AccesoDenegado";
         options.ExpireTimeSpan = TimeSpan.FromHours(2);
     });
 

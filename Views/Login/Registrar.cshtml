@@ -1,0 +1,53 @@
+@model JoyeriaMorgan.Models.UsuarioViewModel
+@{
+    ViewData["Title"] = "Crear Cuenta";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white text-center">
+                <h5 class="mb-0">@ViewData["Title"] - Joyería Morgan</h5>
+            </div>
+            <div class="card-body p-4">
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger small">@ViewBag.Error</div>
+                }
+
+                <form asp-action="Registrar" method="post">
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label">Nombre Completo</label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Ej. Anasofia Martinez" />
+                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Correo" class="form-label">Correo Electrónico</label>
+                        <input asp-for="Correo" type="email" class="form-control" placeholder="correo@ejemplo.com" />
+                        <span asp-validation-for="Correo" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Clave" class="form-label">Contraseña</label>
+                        <input asp-for="Clave" type="password" class="form-control" required />
+                        <span asp-validation-for="Clave" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-dark">Registrar Cuenta</button>
+                    </div>
+                </form>
+
+                <hr />
+                <div class="text-center small">
+                    ¿Ya tienes cuenta? <a asp-action="Login">Inicia sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
