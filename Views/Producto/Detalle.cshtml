@@ -3,35 +3,53 @@
     ViewData["Title"] = Model.Nombre;
 }
 
-<div class="row justify-content-center mt-4">
-    <div class="col-md-6">
-        <div class="card shadow">
+<div class="container py-5">
+    <div class="mb-4">
+        <a asp-action="Index" class="text-decoration-none text-muted small text-uppercase tracking-widest">
+            &larr; Volver al Catálogo
+        </a>
+    </div>
 
-            @if (!string.IsNullOrWhiteSpace(Model.ImagenUrl))
-            {
-                <img src="@Model.ImagenUrl" class="card-img-top" alt="@Model.Nombre"
-                     style="max-height: 350px; object-fit: cover;" />
-            }
-
-
-            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">@Model.Nombre</h5>
-                <span class="badge bg-secondary">@Model.NombreCategoria</span>
+    <div class="row g-5 align-items-center">
+        <div class="col-md-6">
+            <div class="image-zoom-holder shadow-sm">
+                @if (!string.IsNullOrWhiteSpace(Model.ImagenUrl))
+                {
+                    <img src="@Model.ImagenUrl" alt="@Model.Nombre" style="height: 520px;" />
+                }
+                else
+                {
+                    <div class="d-flex align-items-center justify-content-center bg-light text-muted"
+                         style="height: 520px;">
+                        <span>Sin Imagen</span>
+                    </div>
+                }
             </div>
-            <div class="card-body">
-                <h4 class="text-primary mb-3">S/ @Model.Precio.ToString("N2")</h4>
-                <p class="card-text">
-                    <strong>Descripción:</strong><br />
-                    @(string.IsNullOrEmpty(Model.Descripcion) ? "No se ha proporcionado una descripción para este producto." : Model.Descripcion)
-                </p>
-                <hr />
-                <p class="card-text mb-0">
-                    <strong>Disponibilidad en almacén:</strong> @Model.Stock unidades
-                </p>
+        </div>
+
+
+        <div class="col-md-6">
+            <span class="text-uppercase text-muted small tracking-widest">@Model.NombreCategoria</span>
+            <h1 class="section-title-kaira mt-2 mb-3" style="font-size: 2.4rem;">@Model.Nombre</h1>
+
+            <div class="fs-4 text-dark mb-4">
+                S/ @Model.Precio.ToString("N2")
             </div>
-            <div class="card-footer d-flex justify-content-between">
-                <a asp-action="Index" class="btn btn-outline-secondary">Volver al Catálogo</a>
-                <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-warning">Editar</a>
+
+            <hr class="text-muted my-4" />
+
+            <p class="text-muted lh-lg mb-4">
+                @(string.IsNullOrEmpty(Model.Descripcion) ? "Joya elaborada artesanalmente con metales nobles y terminaciones de alta precisión." : Model.Descripcion)
+            </p>
+
+            <div class="small text-uppercase mb-4 @(Model.Stock > 0 ? "text-success" : "text-danger")">
+                @(Model.Stock > 0 ? $"• Disponible en stock ({Model.Stock} unidades)" : "Agotado temporalmente")
+            </div>
+
+            <div class="mt-4">
+                <a asp-action="Index" class="btn btn-dark px-5 text-uppercase fs-6 rounded-0">
+                    Seguir Explorando
+                </a>
             </div>
         </div>
     </div>

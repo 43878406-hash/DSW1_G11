@@ -1,99 +1,90 @@
 @model IEnumerable<JoyeriaMorgan.Models.ProductoViewModel>
 @{
-    ViewData["Title"] = "Catálogo de Joyas";
+    ViewData["Title"] = "Catálogo";
     int pagina = ViewBag.Pagina ?? 1;
     int totalPaginas = ViewBag.TotalPaginas ?? 1;
 }
 
-@if (TempData["Exito"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <strong>¡Éxito!</strong> @TempData["Exito"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<div class="py-4">
+    <div class="text-center mb-5">
+        <h1 class="section-title-kaira">Nuestras Joyas</h1>
+        <p class="section-subtitle-kaira">
+            Explora nuestro catálogo completo. Diseño clásico, artesanía excepcional y materiales eternos.
+        </p>
     </div>
-}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0">@ViewData["Title"]</h1>
-    <a class="btn btn-dark" asp-action="Registrar">Nueva Joya</a>
-</div>
-
-<div class="card mb-4">
-    <div class="card-body">
-        <form asp-action="Index" method="get" class="row g-2">
-            <div class="col-md-10">
-                <input type="text" name="buscar" value="@ViewBag.Buscar" class="form-control"
-                       placeholder="Buscar por nombre de joya o categoría (ej. Anillo, Collares)..." />
-            </div>
-            <div class="col-md-2 d-grid">
-                <button class="btn btn-outline-primary" type="submit">Buscar</button>
-            </div>
-        </form>
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-6">
+            <form asp-action="Index" method="get" class="d-flex border-bottom pb-1">
+                <input type="text" name="buscar" value="@ViewBag.Buscar"
+                       class="form-control border-0 shadow-none px-0 fs-5"
+                       placeholder="Buscar joya por nombre o categoría..." />
+                <button class="btn btn-link text-dark px-2 border-0 shadow-none" type="submit">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+            </form>
+        </div>
     </div>
-</div>
 
-<div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
-    @foreach (var p in Model)
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 mb-5">
+        @foreach (var p in Model)
+        {
+            <div class="col">
+                <div class="card-item text-center">
+                    <div class="image-zoom-holder mb-3">
+                        <a asp-action="Detalle" asp-route-id="@p.Id">
+                            @if (!string.IsNullOrWhiteSpace(p.ImagenUrl))
+                            {
+                                <img src="@p.ImagenUrl" alt="@p.Nombre" />
+                            }
+                            else
+                            {
+                                <div class="d-flex align-items-center justify-content-center bg-light text-muted"
+                                     style="height: 400px;">
+                                    <span>Sin Imagen</span>
+                                </div>
+                            }
+                        </a>
+                    </div>
+
+                    <span class="text-uppercase small text-muted tracking-widest" style="font-size: 0.75rem;">
+                        @p.NombreCategoria
+                    </span>
+
+                    <h5 class="kaira-card-title mb-1">
+                        <a asp-action="Detalle" asp-route-id="@p.Id" class="text-decoration-none text-dark">
+                            @p.Nombre
+                        </a>
+                    </h5>
+                    <div class="kaira-price">
+                        S/ @p.Precio.ToString("N2")
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!Model.Any())
     {
-        <div class="col">
-            <div class="card h-100 shadow-sm">
-
-                @if (!string.IsNullOrWhiteSpace(p.ImagenUrl))
-                {
-                    <img src="@p.ImagenUrl" class="card-img-top" alt="@p.Nombre" style="height: 220px; object-fit: cover;" />
-                }
-                else
-                {
-                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center text-muted"
-                         style="height: 220px;">
-                        <span>Sin Imagen</span>
-                    </div>
-                }
-                <!-- ======================================================== -->
-
-                <div class="card-body">
-                    <span class="badge bg-secondary mb-2">@p.NombreCategoria</span>
-                    <h5 class="card-title">@p.Nombre</h5>
-                    <p class="card-text text-muted small">
-                        @(string.IsNullOrEmpty(p.Descripcion) ? "Sin descripción disponible." : p.Descripcion)
-                    </p>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <span class="h5 mb-0 text-primary">S/ @p.Precio.ToString("N2")</span>
-                        <span class="badge @(p.Stock > 0 ? "bg-success" : "bg-danger")">
-                            Stock: @p.Stock
-                        </span>
-                    </div>
-                </div>
-                <div class="card-footer bg-transparent d-flex justify-content-between">
-                    <a asp-action="Detalle" asp-route-id="@p.Id" class="btn btn-sm btn-outline-info">Ver</a>
-                    <div>
-                        <a asp-action="Editar" asp-route-id="@p.Id" class="btn btn-sm btn-outline-warning">Editar</a>
-                        <form asp-action="Eliminar" asp-route-id="@p.Id" method="post" class="d-inline"
-                              onsubmit="return confirm('¿Está seguro de eliminar esta joya?');">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+        <div class="text-center py-5">
+            <p class="text-muted fs-5">No se encontraron joyas en el catálogo.</p>
         </div>
     }
+
+    @if (string.IsNullOrEmpty(ViewBag.Buscar as string) && totalPaginas > 1)
+    {
+        <nav class="mt-5">
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= totalPaginas; i++)
+                {
+                    <li class="page-item @(i == pagina ? "active" : "")">
+                        <a class="page-link px-3 py-2 text-dark" asp-action="Index" asp-route-pagina="@i">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
 </div>
-
-@if (!Model.Any())
-{
-    <div class="alert alert-warning text-center">No se encontraron joyas en el catálogo.</div>
-}
-
-@if (string.IsNullOrEmpty(ViewBag.Buscar as string) && totalPaginas > 1)
-{
-    <nav>
-        <ul class="pagination justify-content-center">
-            @for (int i = 1; i <= totalPaginas; i++)
-            {
-                <li class="page-item @(i == pagina ? "active" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-pagina="@i">@i</a>
-                </li>
-            }
-        </ul>
-    </nav>
-}
