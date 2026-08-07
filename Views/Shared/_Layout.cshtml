@@ -45,13 +45,18 @@
                         </li>
                         @if (User.IsInRole("Admin"))
                         {
-                            <li class="nav-item">
-                                <span class="nav-link badge bg-dark text-white mt-1 ms-2">Modo Admin</span>
+                            <li class="nav-item ms-lg-2">
+                                <a asp-controller="Admin" asp-action="Index"
+                                   class="btn btn-dark btn-sm text-uppercase tracking-widest mt-1 px-3 rounded-0"
+                                   style="font-size: 0.75rem;">
+                                    Panel Admin
+                                </a>
                             </li>
                         }
                     </ul>
 
                     <ul class="navbar-nav ms-auto align-items-center">
+                        <!-- Enlace a la Bolsa de Compra -->
                         <li class="nav-item me-4">
                             <a class="nav-link text-dark text-uppercase tracking-widest d-flex align-items-center"
                                asp-controller="Carrito" asp-action="Index"
@@ -62,28 +67,60 @@
                                     <line x1="3" y1="6" x2="21" y2="6"></line>
                                     <path d="M16 10a4 4 0 0 1-8 0"></path>
                                 </svg>
+                                <span>Bolsa</span>
                             </a>
                         </li>
+
                         @if (User.Identity!.IsAuthenticated)
                         {
-                            <li class="nav-item me-3">
-                                <span class="text-muted small">
+                            <!-- ==================== DROPDOWN USUARIO (KAIRA STYLE) ==================== -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark text-uppercase tracking-widest" href="#"
+                                   id="menuUsuario" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                   style="font-size: 0.85rem; font-weight: 500;">
                                     Hola, <strong>@User.Identity.Name</strong>
-                                </span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end rounded-0 border shadow-sm mt-2"
+                                    aria-labelledby="menuUsuario">
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item py-2 small text-uppercase" asp-controller="Admin"
+                                               asp-action="Index">
+                                                Panel Admin
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider my-1">
+                                        </li>
+                                    }
+                                    <li>
+                                        <a class="dropdown-item py-2 small text-uppercase" asp-controller="Pedido"
+                                           asp-action="MisPedidos">
+                                            Mis Pedidos
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider my-1">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2 small text-uppercase text-danger"
+                                           asp-controller="Login" asp-action="Logout">
+                                            Cerrar Sesión
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
-                            <li class="nav-item">
-                                <a class="btn btn-outline-dark btn-sm text-uppercase" asp-controller="Login"
-                                   asp-action="Logout">Salir</a>
-                            </li>
+                            <!-- ======================================================================== -->
                         }
                         else
                         {
                             <li class="nav-item me-2">
-                                <a class="btn btn-outline-dark btn-sm text-uppercase" asp-controller="Login"
+                                <a class="btn btn-outline-dark btn-sm text-uppercase rounded-0" asp-controller="Login"
                                    asp-action="Login">Ingresar</a>
                             </li>
                             <li class="nav-item">
-                                <a class="btn btn-dark btn-sm text-uppercase" asp-controller="Login"
+                                <a class="btn btn-dark btn-sm text-uppercase rounded-0" asp-controller="Login"
                                    asp-action="Registrar">Crear Cuenta</a>
                             </li>
                         }
