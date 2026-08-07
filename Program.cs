@@ -8,6 +8,15 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<JoyeriaMorgan.Data.ConexionBD>();
 builder.Services.AddScoped<JoyeriaMorgan.Data.IProductoRepositorio, JoyeriaMorgan.Data.ProductoRepositorio>();
 builder.Services.AddScoped<JoyeriaMorgan.Data.IUsuarioRepositorio, JoyeriaMorgan.Data.UsuarioRepositorio>();
+builder.Services.AddScoped<JoyeriaMorgan.Data.IVentaRepositorio, JoyeriaMorgan.Data.VentaRepositorio>();
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(45);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -31,6 +40,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();
