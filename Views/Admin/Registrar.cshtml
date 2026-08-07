@@ -1,0 +1,67 @@
+@model JoyeriaMorgan.Models.ProductoViewModel
+@{
+    ViewData["Title"] = "Registrar Nueva Joya";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-8">
+        <div class="card border-0 bg-light p-4 p-md-5 rounded-0">
+            <h2 class="section-title-kaira mb-4" style="font-size: 1.8rem;">Registrar Nueva Joya</h2>
+
+            <form asp-action="Registrar" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CategoriaId" class="form-label small text-uppercase fw-bold"></label>
+                        <select asp-for="CategoriaId" asp-items="ViewBag.Categorias" class="form-select rounded-0 p-2">
+                            <option value="">-- Seleccione una Categoría --</option>
+                        </select>
+                        <span asp-validation-for="CategoriaId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Nombre" class="form-label small text-uppercase fw-bold"></label>
+                        <input asp-for="Nombre" class="form-control rounded-0 p-2"
+                               placeholder="Ej: Anillo Solitario Oro" />
+                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Descripcion" class="form-label small text-uppercase fw-bold"></label>
+                    <textarea asp-for="Descripcion" class="form-control rounded-0 p-2" rows="3"></textarea>
+                    <span asp-validation-for="Descripcion" class="text-danger small"></span>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Precio" class="form-label small text-uppercase fw-bold">Precio (S/)</label>
+                        <input asp-for="Precio" type="number" step="0.01" class="form-control rounded-0 p-2" />
+                        <span asp-validation-for="Precio" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Stock" class="form-label small text-uppercase fw-bold"></label>
+                        <input asp-for="Stock" type="number" class="form-control rounded-0 p-2" />
+                        <span asp-validation-for="Stock" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="ImagenUrl" class="form-label small text-uppercase fw-bold">URL de Imagen (.jpg /
+                        .png)</label>
+                        <input asp-for="ImagenUrl" class="form-control rounded-0 p-2"
+                               placeholder="https://ejemplo.com/joya.jpg" />
+                        <span asp-validation-for="ImagenUrl" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn-link-kaira">&larr; Volver al Panel</a>
+                        <button type="submit" class="btn btn-dark px-5 py-2 text-uppercase rounded-0">Guardar Joya</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }

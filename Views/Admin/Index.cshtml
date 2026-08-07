@@ -1,0 +1,114 @@
+@model IEnumerable<JoyeriaMorgan.Models.ProductoViewModel>
+@{
+    ViewData["Title"] = "Gestión de Inventario";
+    int pagina = ViewBag.Pagina ?? 1;
+    int totalPaginas = ViewBag.TotalPaginas ?? 1;
+}
+
+<div class="py-4">
+    <!-- Encabezado del Panel -->
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h1 class="section-title-kaira mb-1" style="font-size: 2.2rem;">Panel de Inventario</h1>
+            <p class="text-muted small mb-0">Administración de joyas, precios y stock en almacén.</p>
+        </div>
+        <div>
+            <a asp-action="Registrar" class="btn btn-dark px-4 py-2 text-uppercase fs-6 rounded-0">
+                + Nueva Joya
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success rounded-0 small mb-4">
+            @TempData["Exito"]
+        </div>
+    }
+
+    <!-- Buscador -->
+    <div class="card border-0 bg-light p-3 rounded-0 mb-4">
+        <form asp-action="Index" method="get" class="row g-2 align-items-center">
+            <div class="col-md-10">
+                <input type="text" name="buscar" value="@ViewBag.Buscar" class="form-control rounded-0 border-0 p-2"
+                       placeholder="Buscar joya por nombre o categoría (Ej: Anillos, Collares)..." />
+            </div>
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-outline-dark rounded-0 text-uppercase" type="submit">Buscar</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla de Inventario -->
+    <div class="table-responsive">
+        <table class="table table-hover align-middle border">
+            <thead class="bg-dark text-white text-uppercase small tracking-widest">
+                <tr>
+                    <th scope="col" class="py-3" style="width: 80px;">Img</th>
+                    <th scope="col" class="py-3">Nombre</th>
+                    <th scope="col" class="py-3">Categoría</th>
+                    <th scope="col" class="py-3 text-end">Precio (S/)</th>
+                    <th scope="col" class="py-3 text-center">Stock</th>
+                    <th scope="col" class="py-3 text-end" style="width: 180px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(p.ImagenUrl))
+                            {
+                                <img src="@p.ImagenUrl" alt="@p.Nombre" class="object-fit-cover border"
+                                     style="width: 50px; height: 50px;" />
+                            }
+                            else
+                            {
+                                <div class="bg-light text-muted d-flex align-items-center justify-content-center border"
+                                     style="width: 50px; height: 50px; font-size: 0.65rem;">
+                                    N/A
+                                </div>
+                            }
+                        </td>
+                        <td class="fw-bold text-dark">@p.Nombre</td>
+                        <td>
+                            <span class="badge bg-light text-dark border rounded-0 px-2 py-1">
+                                @p.NombreCategoria
+                            </span>
+                        </td>
+                        <td class="text-end">@p.Precio.ToString("N2")</td>
+                        <td class="text-center">
+                            <span
+                                class="badge @(p.Stock > 5 ? "bg-success" : (p.Stock > 0 ? "bg-warning text-dark" : "bg-danger")) rounded-0">
+                                @p.Stock
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Editar" asp-route-id="@p.Id"
+                               class="btn btn-sm btn-outline-dark rounded-0 me-1">Editar</a>
+                            <form asp-action="Eliminar" asp-route-id="@p.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('¿Confirma que desea eliminar la joya @p.Nombre?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-0">X</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación -->
+    @if (string.IsNullOrEmpty(ViewBag.Buscar as string) && totalPaginas > 1)
+    {
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= totalPaginas; i++)
+                {
+                    <li class="page-item @(i == pagina ? "active" : "")">
+                        <a class="page-link rounded-0 text-dark px-3" asp-action="Index" asp-route-pagina="@i">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>
