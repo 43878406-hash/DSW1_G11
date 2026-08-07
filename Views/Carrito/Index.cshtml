@@ -1,0 +1,152 @@
+@model IEnumerable<JoyeriaMorgan.Models.ItemCarritoViewModel>
+@{
+    ViewData["Title"] = "Tu Bolsa de Compra";
+    decimal totalGeneral = Model.Sum(i => i.Subtotal);
+}
+
+<div class="py-4">
+    <!-- Encabezado Estilo Kaira -->
+    <div class="text-center mb-5">
+        <h1 class="section-title-kaira">Bolsa de Compra</h1>
+        <p class="section-subtitle-kaira">
+            Revisa tu selección de joyas antes de finalizar el pedido.
+        </p>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger text-center small mb-4">@TempData["Error"]</div>
+    }
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success text-center small mb-4">@TempData["Exito"]</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <p class="text-muted fs-5 mb-4">Tu bolsa de compra se encuentra vacía.</p>
+            <a asp-controller="Producto" asp-action="Index" class="btn btn-dark px-4 py-2 text-uppercase fs-6 rounded-0">
+                Explorar Catálogo
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-5">
+            <!-- Tabla de Ítems del Carrito -->
+            <div class="col-lg-8">
+                <div class="table-responsive">
+                    <table class="table align-middle border-bottom">
+                        <thead class="bg-light text-uppercase small text-muted">
+                            <tr>
+                                <th scope="col" class="py-3 border-0">Joya</th>
+                                <th scope="col" class="py-3 border-0 text-center">Precio</th>
+                                <th scope="col" class="py-3 border-0 text-center">Cantidad</th>
+                                <th scope="col" class="py-3 border-0 text-end">Subtotal</th>
+                                <th scope="col" class="py-3 border-0 text-end"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="py-4">
+                                        <div class="d-flex align-items-center">
+                                            @if (!string.IsNullOrWhiteSpace(item.ImagenUrl))
+                                            {
+                                                <img src="@item.ImagenUrl" alt="@item.Nombre" class="me-3 object-fit-cover"
+                                                     style="width: 60px; height: 60px;" />
+                                            }
+                                            <div>
+                                                <h6 class="kaira-card-title my-0" style="font-size: 0.95rem;">
+                                                    @item.Nombre
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center text-muted">
+                                        S/ @item.Precio.ToString("N2")
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-light text-dark px-3 py-2 fs-6 rounded-0 border">
+                                            @item.Cantidad
+                                        </span>
+                                    </td>
+                                    <td class="text-end fw-bold text-dark">
+                                        S/ @item.Subtotal.ToString("N2")
+                                    </td>
+                                    <td class="text-end">
+                                        <form asp-action="Eliminar" asp-route-id="@item.ProductoId" method="post">
+                                            <button type="submit" class="btn btn-link text-danger p-0 border-0"
+                                                    title="Quitar joya">
+                                                &times;
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between mt-3">
+                    <a asp-controller="Producto" asp-action="Index" class="btn-link-kaira">
+                        &larr; Continuar Comprando
+                    </a>
+                    <a asp-action="Vaciar" class="btn-link-kaira text-danger"
+                       onclick="return confirm('¿Deseas vaciar toda tu bolsa de compra?');">
+                        Vaciar Bolsa
+                    </a>
+                </div>
+            </div>
+
+            <!-- Resumen de Pedido y Checkout -->
+            <div class="col-lg-4">
+                <div class="card border-0 bg-light p-4 rounded-0">
+                    <h5 class="kaira-title text-uppercase mb-4">Resumen del Pedido</h5>
+
+                    <div class="d-flex justify-content-between mb-3 text-muted">
+                        <span>Envío Asegurado</span>
+                        <span>Gratuito</span>
+                    </div>
+
+                    <hr class="my-3 text-muted" />
+
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="fs-5 text-dark">Total</span>
+                        <span class="fs-5 fw-bold text-dark">S/ @totalGeneral.ToString("N2")</span>
+                    </div>
+
+                    @if (User.Identity!.IsAuthenticated)
+                    {
+                        <form asp-action="Checkout" method="post">
+                            <div class="mb-3">
+                                <label class="form-label small text-uppercase fw-bold">Dirección de Entrega</label>
+                                <input type="text" name="direccionEnvio" class="form-control rounded-0 p-2"
+                                       placeholder="Ej: Av. Larco 123, Miraflores, Lima" required />
+                            </div>
+
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-dark py-3 text-uppercase tracking-widest rounded-0">
+                                    Confirmar Compra
+                                </button>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning text-center rounded-0 small my-3">
+                            Debes iniciar sesión para confirmar tu compra.
+                        </div>
+                        <div class="d-grid">
+                            <a asp-controller="Login" asp-action="Login" class="btn btn-dark py-3 text-uppercase rounded-0">
+                                Iniciar Sesión para Pagar
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

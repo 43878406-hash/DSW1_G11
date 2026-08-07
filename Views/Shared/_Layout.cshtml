@@ -52,12 +52,23 @@
                     </ul>
 
                     <ul class="navbar-nav ms-auto align-items-center">
+                        <li class="nav-item me-4">
+                            <a class="nav-link text-dark text-uppercase tracking-widest d-flex align-items-center"
+                               asp-controller="Carrito" asp-action="Index"
+                               style="font-size: 0.85rem; font-weight: 500;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="1.5" class="me-1">
+                                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                </svg>
+                            </a>
+                        </li>
                         @if (User.Identity!.IsAuthenticated)
                         {
                             <li class="nav-item me-3">
                                 <span class="text-muted small">
                                     Hola, <strong>@User.Identity.Name</strong>
-                                    (@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value)
                                 </span>
                             </li>
                             <li class="nav-item">

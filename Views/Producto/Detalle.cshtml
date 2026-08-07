@@ -46,11 +46,27 @@
                 @(Model.Stock > 0 ? $"• Disponible en stock ({Model.Stock} unidades)" : "Agotado temporalmente")
             </div>
 
+            
+
             <div class="mt-4">
                 <a asp-action="Index" class="btn btn-dark px-5 text-uppercase fs-6 rounded-0">
                     Seguir Explorando
                 </a>
             </div>
+
+            @if (Model.Stock > 0)
+{
+    <form asp-controller="Carrito" asp-action="Agregar" method="post" class="mt-4">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="d-flex gap-2 align-items-center">
+            <input type="number" name="cantidad" value="1" min="1" max="@Model.Stock" 
+                   class="form-control text-center rounded-0" style="width: 80px;" />
+            <button type="submit" class="btn btn-dark px-4 py-2 text-uppercase rounded-0 flex-grow-1">
+                Añadir a la Bolsa
+            </button>
+        </div>
+    </form>
+}
         </div>
     </div>
 </div>
