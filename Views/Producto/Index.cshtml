@@ -81,7 +81,7 @@
                 @for (int i = 1; i <= totalPaginas; i++)
                 {
                     <li class="page-item @(i == pagina ? "active" : "")">
-                        <a class="page-link px-3 py-2 text-dark" asp-action="Index" asp-route-pagina="@i">@i</a>
+                        <a class="page-link px-3 py-2" asp-action="Index" asp-route-pagina="@i">@i</a>
                     </li>
                 }
             </ul>

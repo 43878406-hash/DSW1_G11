@@ -20,9 +20,15 @@
             Hemos descontado las joyas de nuestro almacén y preparado el envío asegurado.
         </p>
 
-        <div class="mt-4">
-            <a asp-controller="Producto" asp-action="Index" class="btn btn-dark px-5 py-3 text-uppercase rounded-0">
+        <div class="mt-5 d-flex flex-column flex-sm-row justify-content-center gap-3">
+            <a asp-controller="Producto" asp-action="Index"
+               class="btn btn-outline-dark px-4 py-3 text-uppercase tracking-widest rounded-0">
                 Volver al Catálogo
+            </a>
+
+            <a asp-controller="Pedido" asp-action="Detalle" asp-route-id="@ordenId"
+               class="btn btn-dark px-4 py-3 text-uppercase tracking-widest rounded-0">
+                Ver Detalle del Pedido
             </a>
         </div>
     </div>
