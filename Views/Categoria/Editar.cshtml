@@ -1,0 +1,50 @@
+@model JoyeriaMorgan.Models.CategoriaViewModel
+@{
+    ViewData["Title"] = "Editar Categoría";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-6">
+        <div class="card border-0 bg-light p-4 p-md-5 rounded-0">
+            <h2 class="section-title-kaira mb-1" style="font-size: 1.8rem;">Editar Categoría</h2>
+            <p class="text-muted small mb-4">
+                Código <strong>CAT-@Model.Id.ToString("D3")</strong> &middot;
+                @Model.TotalProductos @(Model.TotalProductos == 1 ? "joya asociada" : "joyas asociadas")
+            </p>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger rounded-0 small">@ViewBag.Error</div>
+            }
+
+            <form asp-action="Editar" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="TotalProductos" />
+
+                <div class="mb-4">
+                    <label asp-for="Nombre" class="form-label small text-uppercase fw-bold"></label>
+                    <input asp-for="Nombre" class="form-control rounded-0 p-2" autofocus />
+                    <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    <div class="form-text small">
+                        Al cambiar el nombre se actualiza en todas las joyas que pertenecen a esta categoría.
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-0 text-uppercase px-4">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-dark rounded-0 text-uppercase px-4">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

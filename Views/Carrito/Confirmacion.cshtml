@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "Pedido Confirmado";
+    int ordenId = ViewBag.OrdenId ?? 0;
+}
+
+<div class="row justify-content-center py-5 my-4 text-center">
+    <div class="col-md-6">
+        <div class="mb-4">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="1.5">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+        </div>
+
+        <h1 class="section-title-kaira mb-3">¡Gracias por tu compra!</h1>
+
+        <p class="section-subtitle-kaira mb-4">
+            Tu pedido ha sido registrado con éxito bajo el código
+            <strong class="text-dark">#ORD-@(ordenId.ToString("D4"))</strong>.
+            Hemos descontado las joyas de nuestro almacén y preparado el envío asegurado.
+        </p>
+
+        <div class="mt-5 d-flex flex-column flex-sm-row justify-content-center gap-3">
+            <a asp-controller="Producto" asp-action="Index"
+               class="btn btn-outline-dark px-4 py-3 text-uppercase tracking-widest rounded-0">
+                Volver al Catálogo
+            </a>
+
+            <a asp-controller="Pedido" asp-action="Detalle" asp-route-id="@ordenId"
+               class="btn btn-dark px-4 py-3 text-uppercase tracking-widest rounded-0">
+                Ver Detalle del Pedido
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,197 @@
+@model IEnumerable<JoyeriaMorgan.Models.ItemCarritoViewModel>
+@{
+    ViewData["Title"] = "Tu Bolsa de Compra";
+    decimal totalGeneral = Model.Sum(i => i.Subtotal);
+}
+
+<div class="py-4">
+    <!-- Encabezado Estilo Kaira -->
+    <div class="text-center mb-5">
+        <h1 class="section-title-kaira">Bolsa de Compra</h1>
+        <p class="section-subtitle-kaira">
+            Revisa tu selección de joyas antes de finalizar el pedido.
+        </p>
+    </div>
+
+    @* Los mensajes de éxito y error los pinta el partial _Alertas desde el _Layout *@
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <p class="text-muted fs-5 mb-4">Tu bolsa de compra se encuentra vacía.</p>
+            <a asp-controller="Producto" asp-action="Index" class="btn btn-dark px-4 py-2 text-uppercase fs-6 rounded-0">
+                Explorar Catálogo
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-5">
+            <!-- Tabla de Ítems del Carrito -->
+            <div class="col-lg-8">
+                <div class="table-responsive">
+                    <table class="table align-middle border-bottom">
+                        <thead class="bg-light text-uppercase small text-muted">
+                            <tr>
+                                <th scope="col" class="py-3 border-0">Joya</th>
+                                <th scope="col" class="py-3 border-0 text-center">Precio</th>
+                                <th scope="col" class="py-3 border-0 text-center">Cantidad</th>
+                                <th scope="col" class="py-3 border-0 text-end">Subtotal</th>
+                                <th scope="col" class="py-3 border-0 text-end"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="py-4">
+                                        <div class="d-flex align-items-center">
+                                            @if (!string.IsNullOrWhiteSpace(item.ImagenUrl))
+                                            {
+                                                <img src="@item.ImagenUrl" alt="@item.Nombre" class="me-3 object-fit-cover"
+                                                     style="width: 60px; height: 60px;" />
+                                            }
+                                            <div>
+                                                <h6 class="kaira-card-title my-0" style="font-size: 0.95rem;">
+                                                    @item.Nombre
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center text-muted">
+                                        S/ @item.Precio.ToString("N2")
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-light text-dark px-3 py-2 fs-6 rounded-0 border">
+                                            @item.Cantidad
+                                        </span>
+                                    </td>
+                                    <td class="text-end fw-bold text-dark">
+                                        S/ @item.Subtotal.ToString("N2")
+                                    </td>
+                                    <td class="text-end">
+                                        <!-- Botón que dispara el Modal Individual -->
+                                        <button type="button" class="btn btn-link text-danger p-0 border-0" title="Quitar joya"
+                                                data-bs-toggle="modal" data-bs-target="#modalQuitar-@item.ProductoId">
+                                            &times;
+                                        </button>
+
+                                        <!-- Modal Individual -->
+                                        <div class="modal fade text-start" id="modalQuitar-@item.ProductoId" tabindex="-1"
+                                             aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content rounded-0 border-0 shadow">
+                                                    <div class="modal-header border-bottom-0 pb-0 mt-2">
+                                                        <h5 class="modal-title section-title-kaira fs-4">Quitar de la Bolsa</h5>
+                                                        <button type="button" class="btn-close shadow-none"
+                                                                data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                    </div>
+                                                    <div class="modal-body text-muted fw-normal"
+                                                         style="font-size: 1rem; white-space: normal;">
+                                                        ¿Deseas retirar <strong>@item.Nombre</strong> de tu bolsa de compra?
+                                                    </div>
+                                                    <div class="modal-footer border-top-0 pt-0 mb-2">
+                                                        <button type="button" class="btn btn-light rounded-0 text-uppercase"
+                                                                data-bs-dismiss="modal">Mantener</button>
+                                                        <form asp-action="Eliminar" asp-route-id="@item.ProductoId"
+                                                              method="post" class="d-inline">
+                                                            <button type="submit"
+                                                                    class="btn btn-danger rounded-0 text-uppercase">Quitar
+                                                                Joya</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-3">
+                        <a asp-controller="Producto" asp-action="Index" class="btn-link-kaira">
+                            &larr; Continuar Comprando
+                        </a>
+                        <!-- Botón que dispara el Modal Vaciar -->
+                        <button type="button"
+                                class="btn btn-link text-danger text-decoration-none text-uppercase p-0 border-0 shadow-none"
+                                style="font-size: 0.8rem; letter-spacing: 0.15rem; font-weight: 500;" data-bs-toggle="modal"
+                                data-bs-target="#modalVaciarBolsa">
+                            Vaciar Bolsa
+                        </button>
+
+                        <!-- Modal Vaciar Bolsa -->
+                        <div class="modal fade text-start" id="modalVaciarBolsa" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content rounded-0 border-0 shadow">
+                                    <div class="modal-header border-bottom-0 pb-0 mt-2">
+                                        <h5 class="modal-title section-title-kaira fs-4">Vaciar Bolsa de Compra</h5>
+                                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"
+                                                aria-label="Cerrar"></button>
+                                    </div>
+                                    <div class="modal-body text-muted" style="white-space: normal;">
+                                        ¿Estás seguro de que deseas descartar todas las joyas que has seleccionado?
+                                    </div>
+                                    <div class="modal-footer border-top-0 pt-0 mb-2">
+                                        <button type="button" class="btn btn-light rounded-0 text-uppercase"
+                                                data-bs-dismiss="modal">Cancelar</button>
+                                        <a asp-action="Vaciar" class="btn btn-danger rounded-0 text-uppercase">Sí, Vaciar
+                                            Todo</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resumen de Pedido y Checkout -->
+                    <div class="col-lg-4">
+                        <div class="card border-0 bg-light p-4 rounded-0">
+                            <h5 class="kaira-title text-uppercase mb-4">Resumen del Pedido</h5>
+
+                            <div class="d-flex justify-content-between mb-3 text-muted">
+                                <span>Envío Asegurado</span>
+                                <span>Gratuito</span>
+                            </div>
+
+                            <hr class="my-3 text-muted" />
+
+                            <div class="d-flex justify-content-between mb-4">
+                                <span class="fs-5 text-dark">Total</span>
+                                <span class="fs-5 fw-bold text-dark">S/ @totalGeneral.ToString("N2")</span>
+                            </div>
+
+                            @if (User.Identity!.IsAuthenticated)
+                            {
+                                <form asp-action="Checkout" method="post">
+                                    <div class="mb-3">
+                                        <label class="form-label small text-uppercase fw-bold">Dirección de Entrega</label>
+                                        <input type="text" name="direccionEnvio" class="form-control rounded-0 p-2"
+                                               placeholder="Ej: Av. Larco 123, Miraflores, Lima" required />
+                                    </div>
+
+                                    <div class="d-grid mt-4">
+                                        <button type="submit" class="btn btn-dark py-3 text-uppercase tracking-widest rounded-0">
+                                            Confirmar Compra
+                                        </button>
+                                    </div>
+                                </form>
+                            }
+                            else
+                            {
+                                <div class="alert alert-warning text-center rounded-0 small my-3">
+                                    Debes iniciar sesión para confirmar tu compra.
+                                </div>
+                                <div class="d-grid">
+                                    <a asp-controller="Login" asp-action="Login" class="btn btn-dark py-3 text-uppercase rounded-0">
+                                        Iniciar Sesión para Pagar
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>

@@ -1,0 +1,34 @@
+@*
+    Muestra los mensajes que los controladores dejan en TempData.
+    Se incluye una sola vez en el _Layout para que cualquier accion
+    (login, registro, CRUD, carrito) pueda dar feedback al usuario.
+*@
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show rounded-0 border-0 small d-flex align-items-center"
+         role="alert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             class="me-2 flex-shrink-0">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <span>@TempData["Exito"]</span>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show rounded-0 border-0 small d-flex align-items-center"
+         role="alert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             class="me-2 flex-shrink-0">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>@TempData["Error"]</span>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}

@@ -1,0 +1,81 @@
+@model JoyeriaMorgan.Models.PedidoViewModel
+@{
+    ViewData["Title"] = $"Pedido #ORD-00{Model.Id}";
+}
+
+<div class="py-4">
+    <div class="mb-4">
+        <a asp-action="MisPedidos" class="text-decoration-none text-muted small text-uppercase tracking-widest">
+            &larr; Volver a Mis Pedidos
+        </a>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-baseline border-bottom pb-3 mb-4">
+        <div>
+            <h1 class="section-title-kaira mb-1" style="font-size: 2rem;">
+                Pedido #ORD-@(Model.Id.ToString("D4"))
+            </h1>
+            <p class="text-muted small mb-0">Registrado el @Model.Fecha.ToString("dd/MM/yyyy a las HH:mm")</p>
+        </div>
+        <div>
+            <span class="badge bg-dark text-white rounded-0 px-3 py-2 text-uppercase">
+                @Model.Estado
+            </span>
+        </div>
+    </div>
+
+    <div class="row g-5">
+        <div class="col-lg-8">
+            <h5 class="kaira-card-title mb-3">Joyas Adquiridas</h5>
+            <div class="table-responsive">
+                <table class="table align-middle border">
+                    <thead class="bg-light small text-uppercase text-muted">
+                        <tr>
+                            <th scope="col" class="py-3">Producto</th>
+                            <th scope="col" class="py-3 text-center">Cant.</th>
+                            <th scope="col" class="py-3 text-end">Precio Unit.</th>
+                            <th scope="col" class="py-3 text-end">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Detalles)
+                        {
+                            <tr>
+                                <td class="py-3">
+                                    <div class="d-flex align-items-center">
+                                        @if (!string.IsNullOrWhiteSpace(item.ImagenUrl))
+                                        {
+                                            <img src="@item.ImagenUrl" alt="@item.NombreProducto"
+                                                 class="me-3 object-fit-cover border" style="width: 50px; height: 50px;" />
+                                        }
+                                        <span class="fw-bold text-dark">@item.NombreProducto</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">@item.Cantidad</td>
+                                <td class="text-end text-muted">S/ @item.PrecioUnitario.ToString("N2")</td>
+                                <td class="text-end fw-bold text-dark">S/ @item.Subtotal.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 bg-light p-4 rounded-0">
+                <h5 class="kaira-title text-uppercase mb-3">Datos de Envío</h5>
+                <p class="small text-muted mb-4">
+                    <strong>Dirección registrada:</strong><br />
+                    @Model.DireccionEnvio
+                </p>
+
+                <hr class="text-muted my-3" />
+
+                <div class="d-flex justify-content-between">
+                    <span class="fs-5 text-dark">Total Pagado</span>
+                    <span class="fs-5 fw-bold text-dark">S/ @Model.Total.ToString("N2")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

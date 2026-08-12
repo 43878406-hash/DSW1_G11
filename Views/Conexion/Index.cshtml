@@ -1,0 +1,30 @@
+@{
+  ViewData["Title"] = "Prueba de Conexión"; bool exito = ViewBag.Exito ??
+  false;
+}
+
+<div class="container mt-4">
+  <h2>Prueba de Conexión a Base de Datos</h2>
+  <hr />
+
+  @if (exito)
+  {
+    <div class="alert alert-success">
+      <strong>¡Éxito!</strong> @ViewBag.Mensaje
+    </div>
+    <div class="card border-success mb-3" style="max-width: 28rem">
+      <div class="card-header bg-success text-white">
+        Estado de la Tabla Producto
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">Total de joyas registradas: @ViewBag.Total</h5>
+      </div>
+    </div>
+  }
+  else
+  {
+    <div class="alert alert-danger">
+      <strong>Error de Conexión:</strong> @ViewBag.Mensaje
+    </div>
+  }
+</div>

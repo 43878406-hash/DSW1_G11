@@ -1,0 +1,172 @@
+@model IEnumerable<JoyeriaMorgan.Models.ProductoViewModel>
+@{
+    ViewData["Title"] = "Gestión de Inventario";
+    int pagina = ViewBag.Pagina ?? 1;
+    int totalPaginas = ViewBag.TotalPaginas ?? 1;
+}
+
+<div class="py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h1 class="section-title-kaira mb-1" style="font-size: 2.2rem;">Panel de Administración</h1>
+            <p class="text-muted small mb-0">Resumen comercial y gestión de inventario en almacén.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-controller="Categoria" asp-action="Index"
+               class="btn btn-outline-dark px-4 py-2 text-uppercase fs-6 rounded-0">
+                Categorías
+            </a>
+            <a asp-action="Registrar" class="btn btn-dark px-4 py-2 text-uppercase fs-6 rounded-0">
+                + Nueva Joya
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+
+        <div class="col-md-4">
+            <div class="card border-0 bg-light p-4 rounded-0 text-center shadow-sm h-100 d-flex justify-content-center">
+                <h6 class="text-uppercase text-muted tracking-widest mb-2" style="font-size: 0.75rem;">
+                    Joyas en Catálogo
+                </h6>
+                <h2 class="fw-bold text-dark mb-0" style="font-family: 'Marcellus', serif;">
+                    @ViewBag.TotalJoyas
+                    <span class="fs-6 text-muted fw-normal" style="font-family: 'Jost', sans-serif;">piezas</span>
+                </h2>
+            </div>
+        </div>
+
+
+        <div class="col-md-4">
+            <div
+                class="card border-0 bg-dark text-white p-4 rounded-0 text-center shadow-sm h-100 d-flex justify-content-center">
+                <h6 class="text-uppercase text-white-50 tracking-widest mb-2" style="font-size: 0.75rem;">
+                    Categorías Registradas
+                </h6>
+                <h2 class="fw-bold text-white mb-0" style="font-family: 'Marcellus', serif;">
+                    @ViewBag.TotalCategorias
+                </h2>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Buscador -->
+    <div class="card border-0 bg-light p-3 rounded-0 mb-4">
+        <form asp-action="Index" method="get" class="row g-2 align-items-center">
+            <div class="col-md-10">
+                <input type="text" name="buscar" value="@ViewBag.Buscar" class="form-control rounded-0 border-0 p-2"
+                       placeholder="Buscar joya por nombre o categoría (Ej: Anillos, Collares)..." />
+            </div>
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-outline-dark rounded-0 text-uppercase" type="submit">Buscar</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla de Inventario -->
+    <div class="table-responsive">
+        <table class="table table-hover align-middle border">
+            <thead class="bg-dark text-white text-uppercase small tracking-widest">
+                <tr>
+                    <th scope="col" class="py-3" style="width: 80px;">Img</th>
+                    <th scope="col" class="py-3">Nombre</th>
+                    <th scope="col" class="py-3">Categoría</th>
+                    <th scope="col" class="py-3 text-end">Precio (S/)</th>
+                    <th scope="col" class="py-3 text-center">Stock</th>
+                    <th scope="col" class="py-3 text-end" style="width: 180px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(p.ImagenUrl))
+                            {
+                                <img src="@p.ImagenUrl" alt="@p.Nombre" class="object-fit-cover border"
+                                     style="width: 50px; height: 50px;" />
+                            }
+                            else
+                            {
+                                <div class="bg-light text-muted d-flex align-items-center justify-content-center border"
+                                     style="width: 50px; height: 50px; font-size: 0.65rem;">
+                                    N/A
+                                </div>
+                            }
+                        </td>
+                        <td class="fw-bold text-dark">@p.Nombre</td>
+                        <td>
+                            <span class="badge bg-light text-dark border rounded-0 px-2 py-1">
+                                @p.NombreCategoria
+                            </span>
+                        </td>
+                        <td class="text-end">@p.Precio.ToString("N2")</td>
+                        <td class="text-center">
+                            <span
+                                class="badge @(p.Stock > 5 ? "bg-success" : (p.Stock > 0 ? "bg-warning text-dark" : "bg-danger")) rounded-0">
+                                @p.Stock
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Editar" asp-route-id="@p.Id"
+                               class="btn btn-sm btn-outline-dark rounded-0 me-1">Editar</a>
+
+                            <!-- 1. Botón que dispara el Modal -->
+                            <button type="button" class="btn btn-sm btn-outline-danger rounded-0" data-bs-toggle="modal"
+                                    data-bs-target="#modalEliminar-@p.Id">
+                                X
+                            </button>
+
+                            <!-- 2. Estructura del Modal de Bootstrap -->
+                            <div class="modal fade text-start" id="modalEliminar-@p.Id" tabindex="-1"
+                                 aria-labelledby="modalLabel-@p.Id" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content rounded-0 border-0 shadow">
+                                        <div class="modal-header border-bottom-0 pb-0 mt-2">
+                                            <h5 class="modal-title section-title-kaira fs-4" id="modalLabel-@p.Id">Eliminar
+                                                Joya</h5>
+                                                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"
+                                                        aria-label="Cerrar"></button>
+                                            </div>
+                                            <div class="modal-body text-muted" style="white-space: normal;">
+                                                ¿Estás seguro de que deseas eliminar permanentemente <strong>@p.Nombre</strong>
+                                                del catálogo? Esta acción no se puede deshacer.
+                                            </div>
+                                            <div class="modal-footer border-top-0 pt-0 mb-2">
+                                                <button type="button"
+                                                        class="btn btn-light rounded-0 text-uppercase tracking-widest"
+                                                        data-bs-dismiss="modal">Cancelar</button>
+                                                <!-- El formulario real se mueve adentro del modal -->
+                                                <form asp-action="Eliminar" asp-route-id="@p.Id" method="post" class="d-inline">
+                                                    <button type="submit"
+                                                            class="btn btn-danger rounded-0 text-uppercase tracking-widest">Sí,
+                                                        Eliminar</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            @if (string.IsNullOrEmpty(ViewBag.Buscar as string) && totalPaginas > 1)
+            {
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        @for (int i = 1; i <= totalPaginas; i++)
+                        {
+                            <li class="page-item @(i == pagina ? "active" : "")">
+                                <a class="page-link rounded-0 text-dark px-3" asp-action="Index" asp-route-pagina="@i">@i</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </div>

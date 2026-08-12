@@ -1,0 +1,71 @@
+@model IEnumerable<JoyeriaMorgan.Models.PedidoViewModel>
+@{
+    ViewData["Title"] = "Mis Pedidos";
+}
+
+<div class="py-4">
+    <!-- Encabezado Editorial -->
+    <div class="text-center mb-5">
+        <h1 class="section-title-kaira">Historial de Órdenes</h1>
+        <p class="section-subtitle-kaira">
+            Revisa el estado, fecha y detalle de todas las compras realizadas en Joyería Morgan.
+        </p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <p class="text-muted fs-5 mb-4">Aún no has realizado compras con tu cuenta.</p>
+            <a asp-controller="Producto" asp-action="Index" class="btn btn-dark px-4 py-2 text-uppercase fs-6 rounded-0">
+                Explorar Catálogo
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle border">
+                <thead class="bg-light text-uppercase small text-muted">
+                    <tr>
+                        <th scope="col" class="py-3 border-0">N° Orden</th>
+                        <th scope="col" class="py-3 border-0">Fecha</th>
+                        <th scope="col" class="py-3 border-0">Dirección de Envío</th>
+                        <th scope="col" class="py-3 border-0 text-center">Estado</th>
+                        <th scope="col" class="py-3 border-0 text-end">Total</th>
+                        <th scope="col" class="py-3 border-0 text-end">Detalle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-dark">
+                                #ORD-@(p.Id.ToString("D4"))
+                            </td>
+                            <td class="text-muted small">
+                                @p.Fecha.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                            <td class="text-muted small">
+                                @p.DireccionEnvio
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-dark text-white rounded-0 px-3 py-1 text-uppercase"
+                                      style="font-size: 0.7rem;">
+                                    @p.Estado
+                                </span>
+                            </td>
+                            <td class="text-end fw-bold text-dark">
+                                S/ @p.Total.ToString("N2")
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Detalle" asp-route-id="@p.Id" class="btn-link-kaira">
+                                    Ver Detalle &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
