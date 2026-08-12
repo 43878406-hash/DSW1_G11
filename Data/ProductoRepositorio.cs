@@ -14,7 +14,7 @@ public class ProductoRepositorio : IProductoRepositorio
         _bd = bd;
     }
 
-    public List<ProductoViewModel> Listar(string? buscar = null)
+    public List<ProductoViewModel> Listar(string? buscar = null, int? categoriaId = null)
     {
         var lista = new List<ProductoViewModel>();
         using var cn = _bd.ObtenerConexion();
@@ -24,6 +24,7 @@ public class ProductoRepositorio : IProductoRepositorio
         cmd.CommandType = CommandType.StoredProcedure;
 
         cmd.Parameters.AddWithValue("@Buscar", string.IsNullOrWhiteSpace(buscar) ? DBNull.Value : buscar);
+        cmd.Parameters.AddWithValue("@CategoriaId", (object?)categoriaId ?? DBNull.Value);
 
         using var dr = cmd.ExecuteReader();
         while (dr.Read())
@@ -33,7 +34,7 @@ public class ProductoRepositorio : IProductoRepositorio
         return lista;
     }
 
-    public List<ProductoViewModel> ListarPaginado(int pagina, int tamano, out int total)
+    public List<ProductoViewModel> ListarPaginado(int pagina, int tamano, out int total, int? categoriaId = null)
     {
         var lista = new List<ProductoViewModel>();
         using var cn = _bd.ObtenerConexion();
@@ -43,6 +44,7 @@ public class ProductoRepositorio : IProductoRepositorio
         cmd.CommandType = CommandType.StoredProcedure;
         cmd.Parameters.AddWithValue("@Pagina", pagina);
         cmd.Parameters.AddWithValue("@Tamano", tamano);
+        cmd.Parameters.AddWithValue("@CategoriaId", (object?)categoriaId ?? DBNull.Value);
 
         var paramTotal = new SqlParameter("@Total", SqlDbType.Int) { Direction = ParameterDirection.Output };
         cmd.Parameters.Add(paramTotal);
@@ -119,27 +121,8 @@ public class ProductoRepositorio : IProductoRepositorio
         cmd.ExecuteNonQuery();
     }
 
-    public List<CategoriaViewModel> ListarCategorias()
-    {
-        var categorias = new List<CategoriaViewModel>();
-        using var cn = _bd.ObtenerConexion();
-        cn.Open();
-
-        using var cmd = new SqlCommand("dbo.sp_Categoria_Listar", cn);
-        cmd.CommandType = CommandType.StoredProcedure;
-
-        using var dr = cmd.ExecuteReader();
-        while (dr.Read())
-        {
-            categorias.Add(new CategoriaViewModel
-            {
-                Id = dr.GetInt32(dr.GetOrdinal("Id")),
-                Nombre = dr.GetString(dr.GetOrdinal("Nombre"))
-            });
-        }
-        return categorias;
-    }
-
+    // El listado de categorias vive ahora en CategoriaRepositorio,
+    // que es el unico responsable de esa tabla.
 
     private static ProductoViewModel MapearProducto(SqlDataReader dr)
     {

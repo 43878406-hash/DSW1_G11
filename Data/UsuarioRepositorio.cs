@@ -39,6 +39,23 @@ public class UsuarioRepositorio : IUsuarioRepositorio
         return null;
     }
 
+    public bool ExisteCorreo(string correo)
+    {
+        using var cn = _bd.ObtenerConexion();
+        cn.Open();
+
+        using var cmd = new SqlCommand("dbo.sp_Usuario_ExisteCorreo", cn);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.AddWithValue("@Correo", correo);
+
+        var paramExiste = new SqlParameter("@Existe", SqlDbType.Bit) { Direction = ParameterDirection.Output };
+        cmd.Parameters.Add(paramExiste);
+
+        cmd.ExecuteNonQuery();
+
+        return paramExiste.Value != DBNull.Value && (bool)paramExiste.Value;
+    }
+
     public void Registrar(UsuarioViewModel u)
     {
         using var cn = _bd.ObtenerConexion();

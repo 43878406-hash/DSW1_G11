@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using JoyeriaMorgan.Data;
 using JoyeriaMorgan.Models;
 
@@ -9,11 +10,17 @@ namespace JoyeriaMorgan.Controllers;
 
 public class LoginController : Controller
 {
-    private readonly IUsuarioRepositorio _repo;
+    // Codigos que devuelve SQL Server cuando se viola una restriccion UNIQUE.
+    private const int ErrorSqlClavePrimariaDuplicada = 2627;
+    private const int ErrorSqlIndiceUnicoDuplicado = 2601;
 
-    public LoginController(IUsuarioRepositorio repo)
+    private readonly IUsuarioRepositorio _repo;
+    private readonly ILogger<LoginController> _logger;
+
+    public LoginController(IUsuarioRepositorio repo, ILogger<LoginController> logger)
     {
         _repo = repo;
+        _logger = logger;
     }
 
     // GET: /Login
@@ -33,7 +40,19 @@ public class LoginController : Controller
             return View();
         }
 
-        var usuario = _repo.Login(correo, clave);
+        UsuarioViewModel? usuario;
+        try
+        {
+            usuario = _repo.Login(correo, clave);
+        }
+        catch (SqlException ex)
+        {
+            _logger.LogError(ex, "Fallo el acceso a la base de datos al iniciar sesión.");
+            ViewBag.Error = "No se pudo conectar con la base de datos. Verifica que SQL Server esté encendido "
+                          + "y que la base JoyeriaMorganDB exista (ejecuta morgan_db.sql).";
+            return View();
+        }
+
         if (usuario == null)
         {
             ViewBag.Error = "Correo o contraseña incorrectos.";
@@ -54,7 +73,11 @@ public class LoginController : Controller
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
         TempData["Exito"] = $"¡Bienvenido(a), {usuario.Nombre}!";
-        return RedirectToAction("Index", "Producto");
+
+        // Un administrador entra directo a su panel; un cliente, al catálogo.
+        return usuario.Rol == "Admin"
+            ? RedirectToAction("Index", "Admin")
+            : RedirectToAction("Index", "Producto");
     }
 
     // GET: /Registro
@@ -72,13 +95,32 @@ public class LoginController : Controller
 
         try
         {
+            // 1. Validamos el correo antes de intentar el INSERT, para poder
+            //    mostrar el mensaje en el campo exacto que tiene el problema.
+            if (_repo.ExisteCorreo(modelo.Correo))
+            {
+                ModelState.AddModelError(nameof(modelo.Correo), "Este correo ya se encuentra registrado.");
+                return View(modelo);
+            }
+
             _repo.Registrar(modelo);
-            TempData["Exito"] = "Cuenta creada correctamente. Ya puede iniciar sesión.";
+            TempData["Exito"] = "Cuenta creada correctamente. Ya puedes iniciar sesión.";
             return RedirectToAction(nameof(Login));
         }
-        catch
+        catch (SqlException ex) when (ex.Number is ErrorSqlClavePrimariaDuplicada or ErrorSqlIndiceUnicoDuplicado)
         {
-            ViewBag.Error = "El correo ingresado ya se encuentra registrado.";
+            // 2. Red de seguridad: otro usuario pudo registrar el mismo correo
+            //    entre la validacion anterior y el INSERT.
+            ModelState.AddModelError(nameof(modelo.Correo), "Este correo ya se encuentra registrado.");
+            return View(modelo);
+        }
+        catch (SqlException ex)
+        {
+            // 3. Cualquier otro error de base de datos se informa como lo que
+            //    realmente es, en lugar de disfrazarlo de "correo duplicado".
+            _logger.LogError(ex, "Fallo el acceso a la base de datos al registrar la cuenta.");
+            ViewBag.Error = "No se pudo conectar con la base de datos. Verifica que SQL Server esté encendido "
+                          + "y que la base JoyeriaMorganDB exista (ejecuta morgan_db.sql).";
             return View(modelo);
         }
     }
@@ -88,6 +130,7 @@ public class LoginController : Controller
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        TempData["Exito"] = "Sesión cerrada correctamente.";
         return RedirectToAction("Index", "Producto");
     }
 

@@ -1,116 +1,89 @@
 using JoyeriaMorgan.Data;
 using JoyeriaMorgan.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 
 namespace JoyeriaMorgan.Controllers;
 
+/// <summary>
+/// Catalogo publico de joyas: solo consulta.
+/// El alta, edicion y baja de productos vive en AdminController,
+/// que esta protegido con [Authorize(Roles = "Admin")].
+/// </summary>
 public class ProductoController : Controller
 {
     private readonly IProductoRepositorio _repo;
+    private readonly ICategoriaRepositorio _categoriaRepo;
+    private readonly ILogger<ProductoController> _logger;
 
-    public ProductoController(IProductoRepositorio repo)
+    public ProductoController(
+        IProductoRepositorio repo,
+        ICategoriaRepositorio categoriaRepo,
+        ILogger<ProductoController> logger)
     {
         _repo = repo;
+        _categoriaRepo = categoriaRepo;
+        _logger = logger;
     }
 
-    // GET: /Producto?buscar=anillo&pagina=1
-    public IActionResult Index(string? buscar, int pagina = 1)
+    // GET: /Producto?buscar=anillo&categoriaId=1&pagina=1
+    public IActionResult Index(string? buscar, int? categoriaId, int pagina = 1)
     {
         const int tamano = 6;
-        List<ProductoViewModel> productos;
-        int total;
 
-        if (!string.IsNullOrWhiteSpace(buscar))
-        {
-            productos = _repo.Listar(buscar);
-            total = productos.Count;
-        }
-        else
-        {
-            productos = _repo.ListarPaginado(pagina, tamano, out total);
-        }
-
-        ViewBag.Buscar = buscar;
-        ViewBag.Pagina = pagina;
-        ViewBag.TotalPaginas = (int)Math.Ceiling(total / (double)tamano);
         ViewData["Title"] = "Catálogo de Joyas";
+        ViewBag.Buscar = buscar;
+        ViewBag.CategoriaId = categoriaId;
+        ViewBag.Pagina = pagina;
+        ViewBag.TotalPaginas = 1;
+        ViewBag.Categorias = new List<CategoriaViewModel>();
 
-        return View(productos);
+        try
+        {
+            List<ProductoViewModel> productos;
+            int total;
+
+            if (!string.IsNullOrWhiteSpace(buscar))
+            {
+                // La busqueda por texto devuelve todas las coincidencias sin paginar.
+                productos = _repo.Listar(buscar, categoriaId);
+                total = productos.Count;
+                ViewBag.TotalPaginas = 1;
+            }
+            else
+            {
+                productos = _repo.ListarPaginado(pagina, tamano, out total, categoriaId);
+                ViewBag.TotalPaginas = (int)Math.Ceiling(total / (double)tamano);
+            }
+
+            ViewBag.TotalResultados = total;
+            ViewBag.Categorias = _categoriaRepo.Listar();
+
+            return View(productos);
+        }
+        catch (SqlException ex)
+        {
+            _logger.LogError(ex, "Fallo el acceso a la base de datos al cargar el catálogo.");
+            TempData["Error"] = "No se pudo cargar el catálogo porque no hay conexión con la base de datos. "
+                              + "Verifica que SQL Server esté encendido y que la base JoyeriaMorganDB exista "
+                              + "(ejecuta morgan_db.sql).";
+            return View(new List<ProductoViewModel>());
+        }
     }
 
     // GET: /Producto/Detalle/5
     public IActionResult Detalle(int id)
     {
-        var producto = _repo.ObtenerPorId(id);
-        return producto == null ? NotFound() : View(producto);
-    }
-
-    // GET: /Producto/Registrar
-    [HttpGet]
-    public IActionResult Registrar()
-    {
-        CargarCategoriasViewBag();
-        return View();
-    }
-
-    // POST: /Producto/Registrar
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult Registrar(ProductoViewModel modelo)
-    {
-        if (!ModelState.IsValid)
+        try
         {
-            CargarCategoriasViewBag();
-            return View(modelo);
+            var producto = _repo.ObtenerPorId(id);
+            return producto == null ? NotFound() : View(producto);
         }
-
-        _repo.Insertar(modelo);
-        TempData["Exito"] = $"Joya '{modelo.Nombre}' registrada correctamente.";
-        return RedirectToAction(nameof(Index));
-    }
-
-    // GET: /Producto/Editar/5
-    [HttpGet]
-    public IActionResult Editar(int id)
-    {
-        var producto = _repo.ObtenerPorId(id);
-        if (producto == null) return NotFound();
-
-        CargarCategoriasViewBag();
-        return View(producto);
-    }
-
-    // POST: /Producto/Editar
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult Editar(ProductoViewModel modelo)
-    {
-        if (!ModelState.IsValid)
+        catch (SqlException ex)
         {
-            CargarCategoriasViewBag();
-            return View(modelo);
+            _logger.LogError(ex, "Fallo el acceso a la base de datos al cargar el detalle de la joya {Id}.", id);
+            TempData["Error"] = "No se pudo cargar la joya porque no hay conexión con la base de datos.";
+            return RedirectToAction(nameof(Index));
         }
-
-        _repo.Actualizar(modelo);
-        TempData["Exito"] = $"Joya '{modelo.Nombre}' actualizada correctamente.";
-        return RedirectToAction(nameof(Index));
-    }
-
-    // POST: /Producto/Eliminar/5
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult Eliminar(int id)
-    {
-        _repo.Eliminar(id);
-        TempData["Exito"] = "Joya eliminada del catálogo.";
-        return RedirectToAction(nameof(Index));
-    }
-
-
-    private void CargarCategoriasViewBag()
-    {
-        var categorias = _repo.ListarCategorias();
-        ViewBag.Categorias = new SelectList(categorias, "Id", "Nombre");
     }
 }

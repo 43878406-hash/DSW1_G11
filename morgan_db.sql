@@ -1,4 +1,4 @@
-USE master;
+ÔªøUSE master;
 GO
 
 IF EXISTS (SELECT name FROM sys.databases WHERE name = 'JoyeriaMorganDB')
@@ -80,20 +80,20 @@ INSERT INTO dbo.Producto (CategoriaId, Nombre, Descripcion, Precio, Stock, Image
 (@IdAnillos, 'Anillo Zafiro y Diamantes', 'Majestuoso anillo estilo vintage en oro amarillo con un zafiro azul central', 4200.00, 3, 'https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?q=80&w=600&auto=format&fit=crop'),
 
 -- Collares
-(@IdCollares, 'Collar Perla Elegance', 'Collar de plata con perla cultivada de rÌo', 350.00, 8, 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=600&auto=format&fit=crop'),
+(@IdCollares, 'Collar Perla Elegance', 'Collar de plata con perla cultivada de r√≠o', 350.00, 8, 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=600&auto=format&fit=crop'),
 (@IdCollares, 'Gargantilla de Oro Minimalista', 'Elegante y sutil cadena de oro amarillo 18k', 1450.00, 8, 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?q=80&w=600&auto=format&fit=crop'),
 
 -- Aretes
-(@IdAretes, 'Broqueles de RubÌ', 'Pendientes discretos y elegantes en oro de 18k con rubÌ rojo', 1800.00, 6, 'https://images.unsplash.com/photo-1630019852942-f89202989a59?q=80&w=600&auto=format&fit=crop'),
-(@IdAretes, 'Aretes Largos Swarovski', 'DiseÒo contempor·neo en plata de ley 925 con cristales Swarovski', 450.00, 20, 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600&auto=format&fit=crop'),
+(@IdAretes, 'Broqueles de Rub√≠', 'Pendientes discretos y elegantes en oro de 18k con rub√≠ rojo', 1800.00, 6, 'https://images.unsplash.com/photo-1630019852942-f89202989a59?q=80&w=600&auto=format&fit=crop'),
+(@IdAretes, 'Aretes Largos Swarovski', 'Dise√±o contempor√°neo en plata de ley 925 con cristales Swarovski', 450.00, 20, 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600&auto=format&fit=crop'),
 
 -- Pulseras
-(@IdPulseras, 'Pulsera Tejida Oro Rosa', 'Pulsera ajustable diseÒo exclusivo en oro rosa', 890.00, 5, 'https://cdn-media.glamira.com/media/product/newgeneration/view/1/sku/rhett/alloycolour/red.jpg'),
+(@IdPulseras, 'Pulsera Tejida Oro Rosa', 'Pulsera ajustable dise√±o exclusivo en oro rosa', 890.00, 5, 'https://cdn-media.glamira.com/media/product/newgeneration/view/1/sku/rhett/alloycolour/red.jpg'),
 (@IdPulseras, 'Pulsera Tennis de Circonias', 'Brillante pulsera estilo tennis fabricada en plata rodinada', 650.00, 12, 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=600&auto=format&fit=crop');
 GO
 
 -- =====================================================================
--- PROCEDIMIENTOS ALMACENADOS: CATEGORÕAS Y PRODUCTOS
+-- PROCEDIMIENTOS ALMACENADOS: CATEGOR√çAS Y PRODUCTOS
 -- =====================================================================
 
 CREATE PROCEDURE dbo.sp_Categoria_Listar
@@ -105,16 +105,18 @@ END;
 GO
 
 CREATE PROCEDURE dbo.sp_Producto_Listar
-    @Buscar VARCHAR(100) = NULL
+    @Buscar VARCHAR(100) = NULL,
+    @CategoriaId INT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT 
-        p.Id, p.CategoriaId, c.Nombre AS NombreCategoria, 
+    SELECT
+        p.Id, p.CategoriaId, c.Nombre AS NombreCategoria,
         p.Nombre, p.Descripcion, p.Precio, p.Stock, p.ImagenUrl
     FROM dbo.Producto p
     INNER JOIN dbo.Categoria c ON p.CategoriaId = c.Id
     WHERE (@Buscar IS NULL OR p.Nombre LIKE '%' + @Buscar + '%' OR c.Nombre LIKE '%' + @Buscar + '%')
+      AND (@CategoriaId IS NULL OR p.CategoriaId = @CategoriaId)
     ORDER BY p.Id DESC;
 END;
 GO
@@ -122,20 +124,24 @@ GO
 CREATE PROCEDURE dbo.sp_Producto_ListarPaginado
     @Pagina INT = 1,
     @Tamano INT = 6,
+    @CategoriaId INT = NULL,
     @Total INT OUTPUT
 AS
 BEGIN
-    SET NOCOUNT ON;    
- 
-    SELECT @Total = COUNT(*) FROM dbo.Producto;
+    SET NOCOUNT ON;
 
-    SELECT 
-        p.Id, p.CategoriaId, c.Nombre AS NombreCategoria, 
+    SELECT @Total = COUNT(*)
+    FROM dbo.Producto
+    WHERE (@CategoriaId IS NULL OR CategoriaId = @CategoriaId);
+
+    SELECT
+        p.Id, p.CategoriaId, c.Nombre AS NombreCategoria,
         p.Nombre, p.Descripcion, p.Precio, p.Stock, p.ImagenUrl
     FROM dbo.Producto p
     INNER JOIN dbo.Categoria c ON p.CategoriaId = c.Id
+    WHERE (@CategoriaId IS NULL OR p.CategoriaId = @CategoriaId)
     ORDER BY p.Id DESC
-    OFFSET (@Pagina - 1) * @Tamano ROWS 
+    OFFSET (@Pagina - 1) * @Tamano ROWS
     FETCH NEXT @Tamano ROWS ONLY;
 END;
 GO
@@ -201,7 +207,7 @@ END;
 GO
 
 -- =====================================================================
--- PROCEDIMIENTOS ALMACENADOS: USUARIOS Y AUTENTICACI”N
+-- PROCEDIMIENTOS ALMACENADOS: USUARIOS Y AUTENTICACI√ìN
 -- =====================================================================
 
 CREATE PROCEDURE dbo.sp_Usuario_Login
@@ -298,5 +304,126 @@ BEGIN
     FROM dbo.DetalleVenta d
     INNER JOIN dbo.Producto p ON d.ProductoId = p.Id
     WHERE d.VentaId = @VentaId;
+END;
+GO
+
+-- =====================================================================
+-- PROCEDIMIENTOS ALMACENADOS: MANTENIMIENTO DE CATEGOR√çAS (CRUD)
+-- =====================================================================
+
+-- Lista las categor√≠as junto con la cantidad de joyas que tiene cada una.
+-- Se usa LEFT JOIN para que las categor√≠as vac√≠as tambien aparezcan con 0.
+CREATE PROCEDURE dbo.sp_Categoria_ListarConConteo
+    @Buscar VARCHAR(50) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT
+        c.Id,
+        c.Nombre,
+        COUNT(p.Id) AS TotalProductos
+    FROM dbo.Categoria c
+    LEFT JOIN dbo.Producto p ON p.CategoriaId = c.Id
+    WHERE (@Buscar IS NULL OR c.Nombre LIKE '%' + @Buscar + '%')
+    GROUP BY c.Id, c.Nombre
+    ORDER BY c.Nombre ASC;
+END;
+GO
+
+CREATE PROCEDURE dbo.sp_Categoria_ObtenerPorId
+    @Id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT
+        c.Id,
+        c.Nombre,
+        (SELECT COUNT(*) FROM dbo.Producto p WHERE p.CategoriaId = c.Id) AS TotalProductos
+    FROM dbo.Categoria c
+    WHERE c.Id = @Id;
+END;
+GO
+
+-- Verifica si un nombre de categoria ya existe.
+-- @IdExcluir permite ignorar la propia categoria cuando se esta editando.
+CREATE PROCEDURE dbo.sp_Categoria_ExisteNombre
+    @Nombre VARCHAR(50),
+    @IdExcluir INT = NULL,
+    @Existe BIT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF EXISTS (SELECT 1 FROM dbo.Categoria
+               WHERE Nombre = @Nombre
+                 AND (@IdExcluir IS NULL OR Id <> @IdExcluir))
+        SET @Existe = 1;
+    ELSE
+        SET @Existe = 0;
+END;
+GO
+
+CREATE PROCEDURE dbo.sp_Categoria_Insertar
+    @Nombre VARCHAR(50),
+    @NuevoId INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    INSERT INTO dbo.Categoria (Nombre) VALUES (@Nombre);
+    SET @NuevoId = SCOPE_IDENTITY();
+END;
+GO
+
+CREATE PROCEDURE dbo.sp_Categoria_Actualizar
+    @Id INT,
+    @Nombre VARCHAR(50)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE dbo.Categoria
+    SET Nombre = @Nombre
+    WHERE Id = @Id;
+END;
+GO
+
+-- Elimina la categoria solo si no tiene joyas asociadas (integridad referencial).
+-- @Resultado: 1 = eliminada, 0 = tiene productos, -1 = no existe.
+CREATE PROCEDURE dbo.sp_Categoria_Eliminar
+    @Id INT,
+    @Resultado INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.Categoria WHERE Id = @Id)
+    BEGIN
+        SET @Resultado = -1;
+        RETURN;
+    END
+
+    IF EXISTS (SELECT 1 FROM dbo.Producto WHERE CategoriaId = @Id)
+    BEGIN
+        SET @Resultado = 0;
+        RETURN;
+    END
+
+    DELETE FROM dbo.Categoria WHERE Id = @Id;
+    SET @Resultado = 1;
+END;
+GO
+
+-- =====================================================================
+-- PROCEDIMIENTO ADICIONAL: VALIDACI√ìN DE CORREO EN EL REGISTRO
+-- =====================================================================
+
+CREATE PROCEDURE dbo.sp_Usuario_ExisteCorreo
+    @Correo VARCHAR(100),
+    @Existe BIT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF EXISTS (SELECT 1 FROM dbo.Usuario WHERE Correo = @Correo)
+        SET @Existe = 1;
+    ELSE
+        SET @Existe = 0;
 END;
 GO

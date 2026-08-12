@@ -7,6 +7,7 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddSingleton<JoyeriaMorgan.Data.ConexionBD>();
 builder.Services.AddScoped<JoyeriaMorgan.Data.IProductoRepositorio, JoyeriaMorgan.Data.ProductoRepositorio>();
+builder.Services.AddScoped<JoyeriaMorgan.Data.ICategoriaRepositorio, JoyeriaMorgan.Data.CategoriaRepositorio>();
 builder.Services.AddScoped<JoyeriaMorgan.Data.IUsuarioRepositorio, JoyeriaMorgan.Data.UsuarioRepositorio>();
 builder.Services.AddScoped<JoyeriaMorgan.Data.IVentaRepositorio, JoyeriaMorgan.Data.VentaRepositorio>();
 builder.Services.AddScoped<JoyeriaMorgan.Data.IPedidoRepositorio, JoyeriaMorgan.Data.PedidoRepositorio>();

@@ -10,10 +10,12 @@ namespace JoyeriaMorgan.Controllers;
 public class AdminController : Controller
 {
     private readonly IProductoRepositorio _repo;
+    private readonly ICategoriaRepositorio _categoriaRepo;
 
-    public AdminController(IProductoRepositorio repo)
+    public AdminController(IProductoRepositorio repo, ICategoriaRepositorio categoriaRepo)
     {
         _repo = repo;
+        _categoriaRepo = categoriaRepo;
     }
 
     // GET: /Admin o /Admin/Index
@@ -30,15 +32,22 @@ public class AdminController : Controller
         {
             productos = _repo.Listar(buscar);
             total = productos.Count;
+            ViewBag.TotalPaginas = 1;
         }
         else
         {
             productos = _repo.ListarPaginado(pagina, tamano, out total);
+            ViewBag.TotalPaginas = (int)Math.Ceiling(total / (double)tamano);
         }
+
+        // Un solo viaje a la base nos da las dos cifras del resumen:
+        // cuantas categorias hay y cuantas joyas suman entre todas.
+        var categorias = _categoriaRepo.ListarConConteo();
+        ViewBag.TotalCategorias = categorias.Count;
+        ViewBag.TotalJoyas = categorias.Sum(c => c.TotalProductos);
 
         ViewBag.Buscar = buscar;
         ViewBag.Pagina = pagina;
-        ViewBag.TotalPaginas = (int)Math.Ceiling(total / (double)tamano);
         ViewData["Title"] = "Gestión de Inventario";
 
         return View(productos);
@@ -107,7 +116,7 @@ public class AdminController : Controller
 
     private void CargarCategoriasViewBag()
     {
-        var categorias = _repo.ListarCategorias();
+        var categorias = _categoriaRepo.Listar();
         ViewBag.Categorias = new SelectList(categorias, "Id", "Nombre");
     }
 }

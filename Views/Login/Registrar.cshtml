@@ -5,37 +5,46 @@
 
 <div class="row justify-content-center mt-4">
     <div class="col-md-6">
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white text-center">
-                <h5 class="mb-0">@ViewData["Title"]</h5>
+        <div class="card shadow-sm rounded-0 border">
+            <div class="card-header bg-dark text-white text-center py-3">
+                <h5 class="mb-0 text-white">@ViewData["Title"]</h5>
             </div>
             <div class="card-body p-4">
                 @if (ViewBag.Error != null)
                 {
-                    <div class="alert alert-danger small">@ViewBag.Error</div>
+                    <div class="alert alert-danger rounded-0 small">@ViewBag.Error</div>
                 }
 
                 <form asp-action="Registrar" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
                     <div class="mb-3">
-                        <label asp-for="Nombre" class="form-label">Nombre Completo</label>
-                        <input asp-for="Nombre" class="form-control" placeholder="Ej. Anasofia Martinez" />
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control rounded-0" placeholder="Ej. Anasofia Martinez" />
                         <span asp-validation-for="Nombre" class="text-danger small"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Correo" class="form-label">Correo Electrónico</label>
-                        <input asp-for="Correo" type="email" class="form-control" placeholder="correo@ejemplo.com" />
+                        <label asp-for="Correo" class="form-label"></label>
+                        <input asp-for="Correo" type="email" class="form-control rounded-0" placeholder="correo@ejemplo.com" />
                         <span asp-validation-for="Correo" class="text-danger small"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Clave" class="form-label">Contraseña</label>
-                        <input asp-for="Clave" type="password" class="form-control" required />
-                        <span asp-validation-for="Clave" class="text-danger small"></span>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Clave" class="form-label"></label>
+                            <input asp-for="Clave" type="password" class="form-control rounded-0" />
+                            <span asp-validation-for="Clave" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ConfirmarClave" class="form-label"></label>
+                            <input asp-for="ConfirmarClave" type="password" class="form-control rounded-0" />
+                            <span asp-validation-for="ConfirmarClave" class="text-danger small"></span>
+                        </div>
                     </div>
 
                     <div class="d-grid gap-2 mt-4">
-                        <button type="submit" class="btn btn-dark">Registrar Cuenta</button>
+                        <button type="submit" class="btn btn-dark py-2 text-uppercase rounded-0">Registrar Cuenta</button>
                     </div>
                 </form>
 

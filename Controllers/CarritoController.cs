@@ -9,7 +9,9 @@ namespace JoyeriaMorgan.Controllers;
 
 public class CarritoController : Controller
 {
-    private const string ClaveCarrito = "CarritoJoyeriamorgan";
+    // Se califica el namespace completo porque ASP.NET Core tiene su propia
+    // clase SessionExtensions y el nombre corto resulta ambiguo.
+    private const string ClaveCarrito = JoyeriaMorgan.Helpers.SessionExtensions.ClaveCarrito;
     private readonly IProductoRepositorio _productoRepo;
     private readonly IVentaRepositorio _ventaRepo;
 

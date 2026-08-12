@@ -1,0 +1,159 @@
+@model IEnumerable<JoyeriaMorgan.Models.CategoriaViewModel>
+@{
+    ViewData["Title"] = "Mantenimiento de Categorías";
+}
+
+<div class="py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h1 class="section-title-kaira mb-1" style="font-size: 2.2rem;">Categorías</h1>
+            <p class="text-muted small mb-0">
+                Organiza las colecciones bajo las que se agrupan las joyas del catálogo.
+            </p>
+        </div>
+        <div>
+            <a asp-action="Crear" class="btn btn-dark px-4 py-2 text-uppercase fs-6 rounded-0">
+                + Nueva Categoría
+            </a>
+        </div>
+    </div>
+
+    <!-- Buscador -->
+    <div class="card border-0 bg-light p-3 rounded-0 mb-4">
+        <form asp-action="Index" method="get" class="row g-2 align-items-center">
+            <div class="col-md-10">
+                <input type="text" name="buscar" value="@ViewBag.Buscar" class="form-control rounded-0 border-0 p-2"
+                       placeholder="Buscar categoría por nombre (Ej: Anillos, Collares)..." />
+            </div>
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-outline-dark rounded-0 text-uppercase" type="submit">Buscar</button>
+            </div>
+        </form>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 border">
+            <p class="text-muted fs-5 mb-4">
+                @(string.IsNullOrWhiteSpace(ViewBag.Buscar as string)
+                    ? "Todavía no hay categorías registradas."
+                    : $"No se encontraron categorías que coincidan con \"{ViewBag.Buscar}\".")
+            </p>
+            <a asp-action="Crear" class="btn btn-dark px-4 py-2 text-uppercase fs-6 rounded-0">
+                Crear la primera categoría
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle border">
+                <thead class="bg-dark text-white text-uppercase small tracking-widest">
+                    <tr>
+                        <th scope="col" class="py-3" style="width: 90px;">Código</th>
+                        <th scope="col" class="py-3">Nombre</th>
+                        <th scope="col" class="py-3 text-center" style="width: 180px;">Joyas asociadas</th>
+                        <th scope="col" class="py-3 text-end" style="width: 200px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td class="text-muted small">CAT-@c.Id.ToString("D3")</td>
+                            <td class="fw-bold text-dark">@c.Nombre</td>
+                            <td class="text-center">
+                                @if (c.TotalProductos > 0)
+                                {
+                                    <a asp-controller="Producto" asp-action="Index" asp-route-categoriaId="@c.Id"
+                                       class="badge bg-light text-dark border rounded-0 px-3 py-2 text-decoration-none"
+                                       title="Ver estas joyas en el catálogo">
+                                        @c.TotalProductos
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-muted border rounded-0 px-3 py-2">0</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Editar" asp-route-id="@c.Id"
+                                   class="btn btn-sm btn-outline-dark rounded-0 me-1">Editar</a>
+
+                                <button type="button" class="btn btn-sm btn-outline-danger rounded-0"
+                                        data-bs-toggle="modal" data-bs-target="#modalEliminar-@c.Id"
+                                        title="Eliminar categoría">
+                                    X
+                                </button>
+
+                                <!-- Modal de confirmación -->
+                                <div class="modal fade text-start" id="modalEliminar-@c.Id" tabindex="-1"
+                                     aria-labelledby="modalLabel-@c.Id" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content rounded-0 border-0 shadow">
+                                            <div class="modal-header border-bottom-0 pb-0 mt-2">
+                                                <h5 class="modal-title section-title-kaira fs-4" id="modalLabel-@c.Id">
+                                                    Eliminar Categoría
+                                                </h5>
+                                                <button type="button" class="btn-close shadow-none"
+                                                        data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                            </div>
+                                            <div class="modal-body text-muted" style="white-space: normal;">
+                                                @if (c.TotalProductos > 0)
+                                                {
+                                                    <span>
+                                                        La categoría <strong>@c.Nombre</strong> tiene
+                                                        <strong>@c.TotalProductos</strong>
+                                                        @(c.TotalProductos == 1 ? "joya asociada" : "joyas asociadas").
+                                                        No se puede eliminar hasta que esas joyas se reasignen a otra
+                                                        categoría o se retiren del inventario.
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span>
+                                                        ¿Estás seguro de que deseas eliminar permanentemente la
+                                                        categoría <strong>@c.Nombre</strong>? Esta acción no se puede
+                                                        deshacer.
+                                                    </span>
+                                                }
+                                            </div>
+                                            <div class="modal-footer border-top-0 pt-0 mb-2">
+                                                <button type="button"
+                                                        class="btn btn-light rounded-0 text-uppercase tracking-widest"
+                                                        data-bs-dismiss="modal">
+                                                    @(c.TotalProductos > 0 ? "Entendido" : "Cancelar")
+                                                </button>
+                                                @if (c.TotalProductos == 0)
+                                                {
+                                                    <form asp-action="Eliminar" asp-route-id="@c.Id" method="post"
+                                                          class="d-inline">
+                                                        <button type="submit"
+                                                                class="btn btn-danger rounded-0 text-uppercase tracking-widest">
+                                                            Sí, Eliminar
+                                                        </button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <p class="text-muted small mt-3 mb-0">
+            @Model.Count() @(Model.Count() == 1 ? "categoría registrada" : "categorías registradas").
+        </p>
+    }
+
+    <div class="mt-4 pt-3 border-top">
+        <a asp-controller="Admin" asp-action="Index" class="btn-link-kaira">
+            &larr; Volver al inventario de joyas
+        </a>
+    </div>
+</div>

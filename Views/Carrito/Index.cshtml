@@ -13,14 +13,7 @@
         </p>
     </div>
 
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger text-center small mb-4">@TempData["Error"]</div>
-    }
-    @if (TempData["Exito"] != null)
-    {
-        <div class="alert alert-success text-center small mb-4">@TempData["Exito"]</div>
-    }
+    @* Los mensajes de éxito y error los pinta el partial _Alertas desde el _Layout *@
 
     @if (!Model.Any())
     {

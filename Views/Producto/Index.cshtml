@@ -3,19 +3,36 @@
     ViewData["Title"] = "Catálogo";
     int pagina = ViewBag.Pagina ?? 1;
     int totalPaginas = ViewBag.TotalPaginas ?? 1;
+    int? categoriaId = ViewBag.CategoriaId as int?;
+    var categorias = ViewBag.Categorias as List<JoyeriaMorgan.Models.CategoriaViewModel>
+                     ?? new List<JoyeriaMorgan.Models.CategoriaViewModel>();
+    var categoriaActual = categorias.FirstOrDefault(c => c.Id == categoriaId);
 }
 
 <div class="py-4">
     <div class="text-center mb-5">
-        <h1 class="section-title-kaira">Nuestras Joyas</h1>
+        <h1 class="section-title-kaira">@(categoriaActual != null ? categoriaActual.Nombre : "Nuestras Joyas")</h1>
         <p class="section-subtitle-kaira">
-            Explora nuestro catálogo completo. Diseño clásico, artesanía excepcional y materiales eternos.
+            @if (categoriaActual != null)
+            {
+                <text>Todas las piezas de nuestra colección de @categoriaActual.Nombre.ToLower().</text>
+            }
+            else
+            {
+                <text>Explora nuestro catálogo completo. Diseño clásico, artesanía excepcional y materiales eternos.</text>
+            }
         </p>
     </div>
 
-    <div class="row justify-content-center mb-5">
+    <!-- Buscador -->
+    <div class="row justify-content-center mb-4">
         <div class="col-md-6">
             <form asp-action="Index" method="get" class="d-flex border-bottom pb-1">
+                @* Mantiene el filtro de categoría activo mientras se busca por texto *@
+                @if (categoriaId.HasValue)
+                {
+                    <input type="hidden" name="categoriaId" value="@categoriaId.Value" />
+                }
                 <input type="text" name="buscar" value="@ViewBag.Buscar"
                        class="form-control border-0 shadow-none px-0 fs-5"
                        placeholder="Buscar joya por nombre o categoría..." />
@@ -28,6 +45,26 @@
             </form>
         </div>
     </div>
+
+    <!-- Filtro por categoría -->
+    @if (categorias.Any())
+    {
+        <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
+            <a asp-action="Index" asp-route-buscar="@ViewBag.Buscar"
+               class="btn btn-sm rounded-0 text-uppercase px-3 @(categoriaId.HasValue ? "btn-outline-dark" : "btn-dark")"
+               style="font-size: 0.75rem; letter-spacing: 0.1rem;">
+                Todas
+            </a>
+            @foreach (var c in categorias)
+            {
+                <a asp-action="Index" asp-route-categoriaId="@c.Id" asp-route-buscar="@ViewBag.Buscar"
+                   class="btn btn-sm rounded-0 text-uppercase px-3 @(categoriaId == c.Id ? "btn-dark" : "btn-outline-dark")"
+                   style="font-size: 0.75rem; letter-spacing: 0.1rem;">
+                    @c.Nombre
+                </a>
+            }
+        </div>
+    }
 
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 mb-5">
         @foreach (var p in Model)
@@ -70,7 +107,10 @@
     @if (!Model.Any())
     {
         <div class="text-center py-5">
-            <p class="text-muted fs-5">No se encontraron joyas en el catálogo.</p>
+            <p class="text-muted fs-5 mb-4">No se encontraron joyas con los filtros seleccionados.</p>
+            <a asp-action="Index" class="btn btn-dark px-4 py-2 text-uppercase fs-6 rounded-0">
+                Ver todo el catálogo
+            </a>
         </div>
     }
 
@@ -81,7 +121,8 @@
                 @for (int i = 1; i <= totalPaginas; i++)
                 {
                     <li class="page-item @(i == pagina ? "active" : "")">
-                        <a class="page-link px-3 py-2" asp-action="Index" asp-route-pagina="@i">@i</a>
+                        <a class="page-link px-3 py-2" asp-action="Index" asp-route-pagina="@i"
+                           asp-route-categoriaId="@categoriaId">@i</a>
                     </li>
                 }
             </ul>

@@ -1,7 +1,4 @@
-
-using System.Xml.Schema;
 using Microsoft.Data.SqlClient;
-
 
 namespace JoyeriaMorgan.Data;
 
@@ -12,7 +9,7 @@ public class ConexionBD
     public ConexionBD(IConfiguration configuration)
     {
         _cadena = configuration.GetConnectionString("TiendaDB")
-                    ?? throw new InvalidOperationException("No se encontro la cadena 'TiendaDB' en appsettings.jspn");
+                    ?? throw new InvalidOperationException("No se encontro la cadena 'TiendaDB' en appsettings.json");
     }
 
     public SqlConnection ObtenerConexion() => new SqlConnection(_cadena);

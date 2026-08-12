@@ -12,7 +12,11 @@
             <h1 class="section-title-kaira mb-1" style="font-size: 2.2rem;">Panel de Administración</h1>
             <p class="text-muted small mb-0">Resumen comercial y gestión de inventario en almacén.</p>
         </div>
-        <div>
+        <div class="d-flex gap-2">
+            <a asp-controller="Categoria" asp-action="Index"
+               class="btn btn-outline-dark px-4 py-2 text-uppercase fs-6 rounded-0">
+                Categorías
+            </a>
             <a asp-action="Registrar" class="btn btn-dark px-4 py-2 text-uppercase fs-6 rounded-0">
                 + Nueva Joya
             </a>
@@ -24,10 +28,11 @@
         <div class="col-md-4">
             <div class="card border-0 bg-light p-4 rounded-0 text-center shadow-sm h-100 d-flex justify-content-center">
                 <h6 class="text-uppercase text-muted tracking-widest mb-2" style="font-size: 0.75rem;">
-                    Ventas del Mes
+                    Joyas en Catálogo
                 </h6>
                 <h2 class="fw-bold text-dark mb-0" style="font-family: 'Marcellus', serif;">
-                    24 <span class="fs-6 text-muted fw-normal" style="font-family: 'Jost', sans-serif;">pedidos</span>
+                    @ViewBag.TotalJoyas
+                    <span class="fs-6 text-muted fw-normal" style="font-family: 'Jost', sans-serif;">piezas</span>
                 </h2>
             </div>
         </div>
@@ -37,22 +42,15 @@
             <div
                 class="card border-0 bg-dark text-white p-4 rounded-0 text-center shadow-sm h-100 d-flex justify-content-center">
                 <h6 class="text-uppercase text-white-50 tracking-widest mb-2" style="font-size: 0.75rem;">
-                    Ingresos Mensuales
+                    Categorías Registradas
                 </h6>
                 <h2 class="fw-bold text-white mb-0" style="font-family: 'Marcellus', serif;">
-                    S/ 12,450.00
+                    @ViewBag.TotalCategorias
                 </h2>
             </div>
         </div>
 
     </div>
-
-    @if (TempData["Exito"] != null)
-    {
-        <div class="alert alert-success rounded-0 small mb-4">
-            @TempData["Exito"]
-        </div>
-    }
 
     <!-- Buscador -->
     <div class="card border-0 bg-light p-3 rounded-0 mb-4">
